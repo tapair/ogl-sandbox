@@ -68,9 +68,7 @@ constexpr auto attrib_color{ 1 };
 constexpr int width{ 800 };
 constexpr int height{ 600 };
 
-int main() {
-	using namespace gl;
-
+void initialize_sdl() {
 	SDL_Init(SDL_INIT_VIDEO);
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 	SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
@@ -82,7 +80,17 @@ int main() {
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+}
+void initialize_gl() {
+	glbinding::initialize(
+		reinterpret_cast<glbinding::ProcAddress(*)(const char *)>(SDL_GL_GetProcAddress)
+	);
+}
 
+int main() {
+	using namespace gl;
+	//=========== vv Initialization vv ===========//
+	initialize_sdl();
 
 	auto window{ SDL_CreateWindow("ogl-sandbox",
 		SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
@@ -91,9 +99,9 @@ int main() {
 	) };
 	auto context{ SDL_GL_CreateContext(window) };
 
-	glbinding::initialize(
-		reinterpret_cast<glbinding::ProcAddress(*)(const char *)>(SDL_GL_GetProcAddress)
-	);
+	initialize_gl();
+
+	//=========== ^^ Initialization ^^ ===========//
 
 	auto vs{ glCreateShader(GL_VERTEX_SHADER) };
 	{
