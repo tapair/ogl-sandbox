@@ -1,0 +1,7 @@
+E:/ogl_sandbox/build/CMakeFiles/edit_cache.dir
+E:/ogl_sandbox/build/CMakeFiles/rebuild_cache.dir
+E:/ogl_sandbox/build/dependencies/CMakeFiles/edit_cache.dir
+E:/ogl_sandbox/build/dependencies/CMakeFiles/rebuild_cache.dir
+E:/ogl_sandbox/build/code/triangle_demo/CMakeFiles/triangle_demo.dir
+E:/ogl_sandbox/build/code/triangle_demo/CMakeFiles/edit_cache.dir
+E:/ogl_sandbox/build/code/triangle_demo/CMakeFiles/rebuild_cache.dir

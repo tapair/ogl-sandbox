@@ -1,0 +1,5 @@
+# ninja log v5
+3	28	0	E:/ogl_sandbox/build/CMakeFiles/cmake.verify_globs	256c4778140f0923
+1	2339	7191696725917099	code/triangle_demo/CMakeFiles/triangle_demo.dir/main.cpp.obj	c064ded2e8fc1f3d
+2340	2591	7191696728370544	../bin/triangle_demo/triangle_demo.exe	f66bc79db2739275
+3	34	0	E:/ogl_sandbox/build/CMakeFiles/cmake.verify_globs	256c4778140f0923
