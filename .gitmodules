@@ -1,0 +1,8 @@
+[submodule "dependencies/glbindings"]
+	path = dependencies/glbindings
+	url = https://github.com/cginternals/glbinding.git
+	branch = v3.3
+[submodule "dependencies/sdl2"]
+	path = dependencies/sdl2
+	url = https://github.com/libsdl-org/SDL.git
+	branch = release-2.28.x

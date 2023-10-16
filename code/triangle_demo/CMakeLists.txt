@@ -14,6 +14,6 @@ set_target_properties(${ogls_target} PROPERTIES
 	LIBRARY_OUTPUT_DIRECTORY ${ogls_binary_dir}
 	ARCHIVE_OUTPUT_DIRECTORY ${ogls_binary_dir}
 )
+target_link_libraries(${ogls_target} PUBLIC ogls::dependencies)
+add_compile_definitions(${ogls_target} PUBLIC ${ogls_definitions})
 
-#add_compile_definitions(${ogls_target} PUBLIC ${ogls_definitions})
-#target_link_libraries((${ogls_target} PUBLIC ogls_dependendencies)
