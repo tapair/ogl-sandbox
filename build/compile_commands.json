@@ -1,7 +1,0 @@
-[
-{
-  "directory": "E:/ogl_sandbox/build",
-  "command": "C:\\PROGRA~2\\MICROS~4\\2019\\Community\\VC\\Tools\\MSVC\\14.29.30133\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP /DWIN32 /D_WINDOWS /EHsc /Zi /Ob0 /Od /RTC1 -MDd -std:c++20 /Focode\\triangle_demo\\CMakeFiles\\triangle_demo.dir\\main.cpp.obj /FdTARGET_COMPILE_PDB /FS -c E:\\ogl_sandbox\\code\\triangle_demo\\main.cpp",
-  "file": "E:\\ogl_sandbox\\code\\triangle_demo\\main.cpp"
-}
-]
