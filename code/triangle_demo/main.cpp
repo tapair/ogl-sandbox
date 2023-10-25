@@ -6,6 +6,9 @@
 
 #include <stdio.h>
 
+#include <iostream>
+/*
+
 using mat4x4_t = float[16];
 
 constexpr void mat4x4_ortho(mat4x4_t out, float left, float right, float bottom, float top, float znear, float zfar) noexcept {
@@ -65,8 +68,44 @@ void main() {
 
 constexpr auto attrib_position{ 0 };
 constexpr auto attrib_color{ 1 };
+
+*/
+
+//simple vertex shader
+constexpr std::string_view vertex_shader_source{ R"glsl(
+#version 330 core
+
+layout(location = 0) in vec3 aPos;
+
+void main() {
+	gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);
+}
+
+)glsl"
+
+};
+
+//fragment shader
+//needed to calculate pixels color
+//always orange in this case
+constexpr std::string_view fragment_shader_source{ R"glsl(
+#version 330 core
+
+out vec4 fragColor;
+
+void main() {
+	fragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);
+}
+
+)glsl"
+
+};
+
 constexpr int width{ 800 };
 constexpr int height{ 600 };
+
+constexpr int infoLogSize{ 512 };
+
 
 void initialize_sdl() {
 	SDL_Init(SDL_INIT_VIDEO);
@@ -89,7 +128,9 @@ void initialize_gl() {
 
 int main() {
 	using namespace gl;
+
 	//=========== vv Initialization vv ===========//
+
 	initialize_sdl();
 
 	auto window{ SDL_CreateWindow("ogl-sandbox",
@@ -103,6 +144,105 @@ int main() {
 
 	//=========== ^^ Initialization ^^ ===========//
 
+/*  vertex input  */
+
+const GLfloat vertices [] {
+	-0.5, -0.5, 0.0,
+	 0.5, -0.5, 0.0,
+	 0.0,  0.5, 0.0
+};
+
+
+// GLuint VBO
+// //generate buffer
+// //first arg - identifier
+// //second - address
+// glGenBuffers(1, &VBO);
+// //bind to the target type
+// glBindBuffer(GL_VERTEX_ARRAY, VBO);
+// //copy data to buffer
+// glBufferData(GL_VERTEX_ARRAY, sizeof(vertices), &vertices, GL_STATIC_DRAW);
+
+/*  vertex shader  */
+
+//create shader object
+//arg is shader type
+GLuint vertexShader { glCreateShader(GL_VERTEX_SHADER) };
+//bind shader code to object(second arg is strings count)
+//haha kostilniy pointer as arg
+//than compile
+const auto vertexShaderData{ vertex_shader_source.data() };
+glShaderSource(vertexShader, 1, &vertexShaderData, nullptr);
+glCompileShader(vertexShader);
+//check for errors
+GLint success{ 0 };
+GLchar infoLog[infoLogSize];
+glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
+//if errors exist print error message
+if(!success) {
+	glGetShaderInfoLog(vertexShader, infoLogSize, nullptr, infoLog);
+	std::cout << "ERROR::SHADER::VERTEX::COMPILATION::FAILED \n" << infoLog << std::endl;
+}
+
+GLuint fragmentShader { glCreateShader(GL_FRAGMENT_SHADER) };
+const auto fragmentShaderData{ fragment_shader_source.data() };
+glShaderSource(fragmentShader, 1,  &fragmentShaderData, nullptr);
+glCompileShader(fragmentShader);
+
+/*  fragment shader  */
+
+//doing the same things with fragment shader
+glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
+if(!success) {
+	glGetShaderInfoLog(fragmentShader, infoLogSize, nullptr, infoLog);
+	std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION::FAILED \n" << infoLog << std::endl;
+}
+
+/*  shader program  */
+
+//create program
+GLuint shaderProgram{ glCreateProgram() };
+//attach compiled shaders to program object
+glAttachShader(shaderProgram, vertexShader);
+glAttachShader(shaderProgram, fragmentShader);
+glLinkProgram(shaderProgram);
+//remove attached shaders
+glDeleteShader(vertexShader);
+glDeleteShader(fragmentShader);
+//check for errors
+glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
+if(!success) {
+	glGetProgramInfoLog(shaderProgram, infoLogSize, nullptr, infoLog);
+	std::cout << "ERROR::SHADER::PROGRAM::COMPILATION::FAILED \n" << infoLog << std::endl;
+}
+
+/* binding vertex attributes */
+ //create vertex buffer object and vertex array object
+GLuint VBO{ };
+GLuint VAO{ };
+
+glGenBuffers(1, &VBO);
+glGenVertexArrays(1, &VAO);
+//bind VAO and VBO
+glBindVertexArray(VAO);
+//copy data to buffer
+glBindBuffer(GL_ARRAY_BUFFER, VBO);
+glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+//init vertex attributes pointers
+glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3*sizeof(float), (void*)0);
+glEnableVertexAttribArray(0);
+
+//unbind buffer and array
+glBindBuffer(GL_ARRAY_BUFFER, 0);
+glBindVertexArray(0);
+
+//use shader program
+glUseProgram(shaderProgram);
+
+
+/*
+
+// here is gradient creation
 	auto vs{ glCreateShader(GL_VERTEX_SHADER) };
 	{
 		const GLchar *vertex_source_code{ vertex_shader.data() };
@@ -161,7 +301,7 @@ int main() {
 	glVertexAttribPointer(attrib_position, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 6, (void *)(4 * sizeof(float)));
 
 	const GLfloat g_vertex_buffer_data[] = {
-	/*  R, G, B, A, X, Y  */
+	//  R, G, B, A, X, Y
 		1, 0, 0, 1, 0, 0,
 		0, 1, 0, 1, width, 0,
 		0, 0, 1, 1, width, height,
@@ -176,6 +316,10 @@ int main() {
 	mat4x4_t projection_matrix;
 	mat4x4_ortho(projection_matrix, 0.0f, (float)width, (float)height, 0.0f, 0.0f, 100.0f);
 	glUniformMatrix4fv(glGetUniformLocation(program, "u_projection_matrix"), 1, GL_FALSE, projection_matrix);
+
+	*/
+
+/*  starting a loop  */
 
 	bool running{ true };
 	while (running) {
@@ -193,8 +337,11 @@ int main() {
 			}
 		}
 
-		glBindVertexArray(vao);
-		glDrawArrays(GL_TRIANGLES, 0, 6);
+		//draw triangle
+		glUseProgram(shaderProgram);
+		//bind used VAO
+		glBindVertexArray(VAO);
+		glDrawArrays(GL_TRIANGLES, 0, 3);
 
 		SDL_GL_SwapWindow(window);
 		SDL_Delay(1);
